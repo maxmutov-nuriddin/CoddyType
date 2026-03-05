@@ -6,19 +6,14 @@ const APP_MARKUP = `<div class="page">
       <div class="top-left">
         <div class="brand">
           <div class="logo-box" aria-hidden="true">
-            <svg viewBox="0 0 24 14">
-              <rect x="1" y="1" width="22" height="12" rx="2"></rect>
-              <line x1="5" y1="5" x2="7" y2="5"></line>
-              <line x1="9" y1="5" x2="11" y2="5"></line>
-              <line x1="13" y1="5" x2="15" y2="5"></line>
-              <line x1="17" y1="5" x2="19" y2="5"></line>
-              <line x1="6" y1="9" x2="12" y2="9"></line>
-              <line x1="14" y1="9" x2="18" y2="9"></line>
+            <svg viewBox="0 0 28 22" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.8">
+              <path d="M5 2 L13 11 L5 20"></path>
+              <path d="M13 2 L21 11 L13 20"></path>
             </svg>
           </div>
           <div class="brand-copy">
-            <div class="brand-sub">monkey see</div>
-            <div class="brand-title">monkeytype</div>
+            <div class="brand-sub">coddy camp</div>
+            <div class="brand-title"><span class="brand-accent">Coddy</span>Type</div>
           </div>
         </div>
 

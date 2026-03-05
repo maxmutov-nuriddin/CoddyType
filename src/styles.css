@@ -1,7 +1,7 @@
 ﻿:root {
       --bg-color: #2f333a;
-      --main-color: #e2b714;
-      --caret-color: #e2b714;
+      --main-color: #FF6040;
+      --caret-color: #FF6040;
       --sub-color: #6b7078;
       --sub-alt-color: #262a30;
       --text-color: #d0d0c8;
@@ -150,23 +150,19 @@
 
     .logo-box {
       width: 48px;
-      height: 30px;
+      height: 48px;
       border: 0;
-      background: var(--main-color);
-      border-radius: 8px;
+      background: linear-gradient(145deg, #FF9070 0%, #FF4820 100%);
+      border-radius: 12px;
       display: grid;
       place-items: center;
       flex: 0 0 auto;
+      box-shadow: 0 4px 14px rgba(255, 80, 40, 0.35);
     }
 
     .logo-box svg {
-      width: 29px;
-      height: 18px;
-      stroke: var(--bg-color);
-      fill: none;
-      stroke-width: 2.35;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+      width: 28px;
+      height: 22px;
     }
 
     .brand-copy {
@@ -184,15 +180,21 @@
       line-height: 0.6;
       transform: scale(0.32);
       transform-origin: left center;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
     .brand-title {
       color: var(--text-color);
-      font-size: clamp(3rem, 3.05vw, 3.35rem);
-      font-weight: 600;
+      font-size: clamp(2.6rem, 2.8vw, 3.1rem);
+      font-weight: 700;
       letter-spacing: -0.8px;
       white-space: nowrap;
       line-height: 0.9;
+    }
+
+    .brand-title span.brand-accent {
+      color: var(--main-color);
     }
 
     .top-icons,
@@ -412,10 +414,12 @@
     .page.typing-active .logo-box {
       background: transparent;
       border: 2px solid #70757c;
+      box-shadow: none;
     }
 
     .page.typing-active .logo-box svg {
       stroke: #70757c;
+      opacity: 0.6;
     }
 
     .lang-item {
