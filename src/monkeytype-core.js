@@ -41,7 +41,8 @@ export function initMonkeyType() {
   const STORAGE_KEY = "monkeytype_clone_settings_v3";
   const SESSION_KEY = "monkeytype_has_session";
   const MODE_PRESETS = { time: [15, 30, 60, 120], words: [10, 25, 50, 100] };
-  const DEFAULT_SETTINGS = { mode: "time", time: 15, words: 25, punctuation: false, numbers: false, customText: "" };
+  const DIFFICULTIES = ["very easy", "easy", "medium", "hard", "random"];
+  const DEFAULT_SETTINGS = { mode: "time", time: 15, words: 25, punctuation: false, numbers: false, customText: "", difficulty: "medium" };
 
   const WORDS = "ability about above accept across action active actual advice after again agent agree ahead allow almost alone along already always amount animal answer appear apply argue around arrive artist aspect attack author autumn available avoid aware balance basic become before begin behind believe benefit better between beyond border bottom branch budget build business camera cancel capital career carry center chance change charge choice choose citizen civil claim class clear client close coach color common company compare complete concern connect consider contact contain content control corner correct course create credit culture current damage debate decide define degree demand design detail develop device digital direct discuss doctor driver during easily economy effect effort either enable energy engine enough entire equal escape event exact example exchange exist expect expert explain factor family feature federal fellow field figure final finance finish flight focus follow force forget formal forward friend future garden general global ground group growth handle health heart heavy history holiday honest human identify impact improve include income increase indeed inform inside instead interest invite issue journey judge knowledge language large leader learn level likely listen little local machine major manage market matter measure memory message middle minute modern moment money month moral mother motion nation native nature network notice number object observe occur offer office online option origin output owner paper parent people period person phone photo place planet player policy popular position power prepare present pretty prevent price primary private problem process product program project proper provide public purpose quality quick radio raise range rather reach reason record reduce reflect region relate remain remove report result return reveal review right river safety school science screen search season secure select senior series service settle share short should simple single sister skill small social source space special spirit spring staff stage standard start state station status story street strong student style subject success sudden summer supply support system table target teacher theory thing think thread today topic total toward trade travel treat trend trouble truth under union unique update useful value various vehicle version victory video visit voice wait watch water wealth weight window winter within wonder worker world writer yellow young".split(" ");
   const EASY_WORDS = WORDS.filter((w) => w.length <= 7);
@@ -192,7 +193,8 @@ export function initMonkeyType() {
         words: MODE_PRESETS.words.includes(parsed.words) ? parsed.words : DEFAULT_SETTINGS.words,
         punctuation: !!parsed.punctuation,
         numbers: !!parsed.numbers,
-        customText: typeof parsed.customText === "string" ? parsed.customText : ""
+        customText: typeof parsed.customText === "string" ? parsed.customText : "",
+        difficulty: DIFFICULTIES.includes(parsed.difficulty) ? parsed.difficulty : DEFAULT_SETTINGS.difficulty
       };
     } catch {
       return { ...DEFAULT_SETTINGS };
@@ -554,6 +556,7 @@ export function initMonkeyType() {
     if (MODE_PRESETS.words.includes(cfg.words)) settings.words = cfg.words;
     settings.punctuation = !!cfg.punctuation;
     settings.numbers = !!cfg.numbers;
+    if (DIFFICULTIES.includes(cfg.difficulty)) settings.difficulty = cfg.difficulty;
     saveSettings();
     renderControls();
     renderAdminConfig();
@@ -586,7 +589,8 @@ export function initMonkeyType() {
       time: settings.time,
       words: settings.words,
       punctuation: settings.punctuation,
-      numbers: settings.numbers
+      numbers: settings.numbers,
+      difficulty: settings.difficulty
     });
   }
 
@@ -609,6 +613,9 @@ export function initMonkeyType() {
     });
     el.apConfig.querySelector("[data-toggle='punctuation']")?.classList.toggle("active", settings.punctuation);
     el.apConfig.querySelector("[data-toggle='numbers']")?.classList.toggle("active", settings.numbers);
+    el.apConfig.querySelectorAll(".ap-cfg-diff").forEach(btn => {
+      btn.classList.toggle("active", btn.dataset.diff === settings.difficulty);
+    });
   }
 
   async function setupFirebaseAuth() {
@@ -668,8 +675,21 @@ export function initMonkeyType() {
   const toggleTyping = (on) => el.page.classList.toggle("typing-active", on);
   const toggleTimerRun = (on) => el.page.classList.toggle("timer-running", on);
 
+  const VERY_EASY_WORDS = WORDS.filter((w) => w.length <= 5);
+  const MEDIUM_WORDS = WORDS.filter((w) => w.length <= 9);
+  function getWordPool() {
+    if (settings.difficulty === "very easy") return VERY_EASY_WORDS.length ? VERY_EASY_WORDS : EASY_WORDS;
+    if (settings.difficulty === "easy") return EASY_WORDS.length ? EASY_WORDS : WORDS;
+    if (settings.difficulty === "hard") return WORDS;
+    if (settings.difficulty === "random") {
+      const pools = [VERY_EASY_WORDS, EASY_WORDS, MEDIUM_WORDS, WORDS];
+      return pools[rint(0, pools.length - 1)];
+    }
+    return MEDIUM_WORDS.length ? MEDIUM_WORDS : WORDS;
+  }
+
   function token() {
-    const pool = EASY_WORDS.length ? EASY_WORDS : WORDS;
+    const pool = getWordPool();
     let t = settings.numbers && Math.random() < 0.12 ? String(rint(0, 9999)) : pool[rint(0, pool.length - 1)];
     if (settings.punctuation) {
       if (Math.random() < 0.08) {
@@ -953,7 +973,7 @@ export function initMonkeyType() {
     el.hoverLine.style.opacity = "0.85";
     el.hoverDotRaw.setAttribute("cx", String(s.x)); el.hoverDotRaw.setAttribute("cy", String(s.yRaw)); el.hoverDotRaw.style.opacity = "0.95";
     el.hoverDotWpm.setAttribute("cx", String(s.x)); el.hoverDotWpm.setAttribute("cy", String(s.yWpm)); el.hoverDotWpm.style.opacity = "0.95";
-    el.tooltip.textContent = "t " + s.sec + "s  wpm " + fmt2(s.wpm) + "  raw " + fmt2(s.raw) + "  err " + s.err;
+    el.tooltip.textContent = "t " + s.sec + "s  wpm " + Math.round(s.wpm) + "  raw " + Math.round(s.raw) + "  err " + s.err;
     const svgRect = el.chart.getBoundingClientRect();
     const wrapRect = el.chart.parentElement.getBoundingClientRect();
     const rx = ((s.x / chartGridInfo.width) * svgRect.width) + (svgRect.left - wrapRect.left);
@@ -1076,12 +1096,12 @@ export function initMonkeyType() {
     const raw = Number(fmt2(getRaw()));
     const charsText = correct + "/" + incorrect + "/" + extra + "/" + missed;
 
-    el.wpm.textContent = fmt2(wpm);
-    el.acc.textContent = fmt2(acc) + "%";
-    el.raw.textContent = fmt2(raw);
+    el.wpm.textContent = Math.round(wpm);
+    el.acc.textContent = Math.round(acc) + "%";
+    el.raw.textContent = Math.round(raw);
     el.chars.textContent = charsText;
-    el.consistency.textContent = fmt2(getConsistency()) + "%";
-    el.time.textContent = fmt2(elapsed) + "s";
+    el.consistency.textContent = Math.round(getConsistency()) + "%";
+    el.time.textContent = Math.round(elapsed) + "s";
     el.timeMeta.textContent = fmtSession(elapsed) + " session";
     el.testType.innerHTML = testTypeLabel();
 
@@ -1524,6 +1544,17 @@ export function initMonkeyType() {
       renderControls();
       renderAdminConfig();
       resetTest("toggle-setting");
+      return;
+    }
+    const diffBtn = t.closest(".ap-cfg-diff");
+    if (diffBtn) {
+      const diff = diffBtn.dataset.diff;
+      if (DIFFICULTIES.includes(diff) && diff !== settings.difficulty) {
+        settings.difficulty = diff;
+        saveSettings();
+        renderAdminConfig();
+        resetTest("difficulty-change");
+      }
     }
   });
 

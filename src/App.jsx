@@ -185,6 +185,12 @@ const APP_MARKUP = `<div class="page">
             <span class="ap-cfg-toggle" data-toggle="punctuation">@ punctuation</span>
             <span class="ap-cfg-toggle" data-toggle="numbers"># numbers</span>
             <span class="ap-cfg-sep">|</span>
+            <span class="ap-cfg-diff" data-diff="very easy">very easy</span>
+            <span class="ap-cfg-diff" data-diff="easy">easy</span>
+            <span class="ap-cfg-diff" data-diff="medium">medium</span>
+            <span class="ap-cfg-diff" data-diff="hard">hard</span>
+            <span class="ap-cfg-diff" data-diff="random">random</span>
+            <span class="ap-cfg-sep">|</span>
             <button id="saveConfigBtn" class="ap-cfg-save" type="button">Сохранить</button>
           </div>
         </div>

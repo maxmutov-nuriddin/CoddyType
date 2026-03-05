@@ -9,9 +9,10 @@
       --error-extra-color: #7e2a33;
       --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
       --ease-out-quick: cubic-bezier(0.22, 1, 0.36, 1);
-      --typing-font-size: clamp(24px, 2.2vw, 34px);
+      --typing-font-size: clamp(22px, 1.9vw, 32px);
       --typing-line-height: 1.78;
       --typing-lines: 3;
+      --max-w: min(1320px, calc(100vw - 48px));
     }
 
     * {
@@ -240,7 +241,7 @@
 
     .mode-bar {
       margin: 18px auto 0;
-      width: min(1088px, calc(100% - 24px));
+      width: var(--max-w);
       min-height: 48px;
       border-radius: 10px;
       background: var(--sub-alt-color);
@@ -339,8 +340,8 @@
     }
 
     .lang-row {
-      margin: 104px auto 0;
-      width: min(1120px, 100%);
+      margin: 80px auto 0;
+      width: var(--max-w);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -435,7 +436,7 @@
 
     .typing-wrap {
       margin: 44px auto 0;
-      width: min(1540px, 100%);
+      width: var(--max-w);
       height: calc(var(--typing-font-size) * var(--typing-line-height) * var(--typing-lines));
       overflow: hidden;
       cursor: text;
@@ -636,8 +637,8 @@
 
     .results-screen {
       display: none;
-      margin: 56px auto 0;
-      width: min(1540px, 100%);
+      margin: 48px auto 0;
+      width: var(--max-w);
       color: var(--sub-color);
     }
 
@@ -647,8 +648,8 @@
 
     .results-top {
       display: grid;
-      grid-template-columns: 290px 1fr;
-      gap: 34px;
+      grid-template-columns: clamp(200px, 20vw, 290px) 1fr;
+      gap: clamp(20px, 2.5vw, 34px);
       align-items: start;
       opacity: 0;
       transform: translateY(12px);
@@ -660,7 +661,7 @@
 
     .summary-left .label {
       display: block;
-      font-size: 0.78rem;
+      font-size: 0.92rem;
       color: var(--sub-color);
       text-transform: lowercase;
       margin-bottom: 8px;
@@ -670,7 +671,7 @@
     .summary-left .value {
       color: var(--main-color);
       font-family: Consolas, "Courier New", monospace;
-      font-size: clamp(42px, 4.5vw, 82px);
+      font-size: clamp(52px, 5.5vw, 96px);
       line-height: 0.95;
       letter-spacing: -1px;
     }
@@ -794,7 +795,7 @@
 
     .bottom-card .label {
       color: var(--sub-color);
-      font-size: 0.7rem;
+      font-size: 0.85rem;
       letter-spacing: 0.55px;
       margin-bottom: 8px;
       text-transform: lowercase;
@@ -803,7 +804,7 @@
     .bottom-card .value {
       color: var(--main-color);
       font-family: Consolas, "Courier New", monospace;
-      font-size: clamp(30px, 2.9vw, 58px);
+      font-size: clamp(32px, 3vw, 60px);
       line-height: 1;
       letter-spacing: -0.5px;
       white-space: nowrap;
@@ -1154,7 +1155,8 @@
 
     .ap-cfg-mode,
     .ap-cfg-time,
-    .ap-cfg-toggle {
+    .ap-cfg-toggle,
+    .ap-cfg-diff {
       padding: 5px 12px;
       border-radius: 6px;
       font-size: 0.85rem;
@@ -1167,14 +1169,16 @@
 
     .ap-cfg-mode:hover,
     .ap-cfg-time:hover,
-    .ap-cfg-toggle:hover {
+    .ap-cfg-toggle:hover,
+    .ap-cfg-diff:hover {
       color: var(--text-color);
       background: #252a34;
     }
 
     .ap-cfg-mode.active,
     .ap-cfg-time.active,
-    .ap-cfg-toggle.active {
+    .ap-cfg-toggle.active,
+    .ap-cfg-diff.active {
       background: var(--main-color);
       color: #1a1e25;
       font-weight: 700;
@@ -1528,7 +1532,98 @@
       }
     }
 
+    /* ── 18"+ large screens (≥1920px) ── */
+    @media (min-width: 1920px) {
+      :root {
+        --max-w: min(1540px, calc(100vw - 80px));
+        --typing-font-size: clamp(26px, 1.6vw, 34px);
+      }
+
+      body {
+        padding: 10px 40px 28px;
+      }
+
+      .summary-left .value {
+        font-size: clamp(60px, 4.5vw, 100px);
+      }
+
+      .bottom-card .value {
+        font-size: clamp(38px, 2.6vw, 64px);
+      }
+
+      .chart-svg {
+        height: 280px;
+      }
+    }
+
+    /* ── 13" laptops (≤1366px) ── */
+    @media (max-width: 1366px) {
+      :root {
+        --max-w: min(1200px, calc(100vw - 32px));
+        --typing-font-size: clamp(20px, 1.9vw, 28px);
+      }
+
+      body {
+        padding: 6px 16px 16px;
+      }
+
+      .topbar {
+        min-height: 60px;
+      }
+
+      .brand-title {
+        font-size: clamp(2.4rem, 2.8vw, 3rem);
+      }
+
+      .lang-row {
+        margin-top: 60px;
+        font-size: 0.95rem;
+        gap: 28px;
+      }
+
+      .typing-wrap {
+        margin-top: 36px;
+      }
+
+      .results-screen {
+        margin-top: 32px;
+      }
+
+      .results-top {
+        gap: 20px;
+      }
+
+      .summary-left .value {
+        font-size: clamp(44px, 4.8vw, 80px);
+      }
+
+      .summary-left .label {
+        font-size: 0.82rem;
+      }
+
+      .bottom-card .value {
+        font-size: clamp(28px, 2.8vw, 50px);
+      }
+
+      .bottom-card .label {
+        font-size: 0.78rem;
+      }
+
+      .chart-svg {
+        height: 210px;
+      }
+
+      .results-bottom {
+        gap: 16px;
+      }
+    }
+
+    /* ── tablet / small screens (≤980px) ── */
     @media (max-width: 980px) {
+      :root {
+        --max-w: calc(100vw - 28px);
+      }
+
       body {
         padding: 12px 14px 18px;
       }
