@@ -177,6 +177,9 @@ export function initMonkeyType() {
   let adminAllRows = [];   // cache of all user docs
   let adminSortCol = "maxWpm";
   let adminSortAsc = false;
+  let wordsTranslateY = 0;
+  let currentLineOffsetTop = -1;
+  let cachedLineHeight = 0;
 
   function loadSettings() {
     try {
@@ -764,6 +767,21 @@ export function initMonkeyType() {
     return "custom<br>english";
   }
 
+  function calcLineHeight() {
+    if (cachedLineHeight > 0) return cachedLineHeight;
+    if (charSpans.length > 1) {
+      const top0 = charSpans[0].offsetTop;
+      for (let i = 1; i < charSpans.length; i++) {
+        if (charSpans[i].offsetTop > top0) {
+          cachedLineHeight = charSpans[i].offsetTop - top0;
+          return cachedLineHeight;
+        }
+      }
+    }
+    cachedLineHeight = parseFloat(getComputedStyle(el.words).fontSize) * 1.78;
+    return cachedLineHeight;
+  }
+
   function syncSmoothCaret(index) {
     if (!el.caret) return;
     if (!charSpans.length || finished) {
@@ -774,7 +792,7 @@ export function initMonkeyType() {
     const span = charSpans[safe];
     if (!span) return;
     const x = span.offsetLeft - 3;
-    const y = span.offsetTop - el.words.scrollTop + 7;
+    const y = span.offsetTop + wordsTranslateY + 7;
     const h = Math.max(20, Math.round(span.getBoundingClientRect().height * 0.72));
     el.caret.style.height = h + "px";
     el.caret.style.transform = "translate3d(" + x + "px, " + y + "px, 0)";
@@ -1154,8 +1172,18 @@ export function initMonkeyType() {
     if (charSpans[caret]) {
       charSpans[caret].classList.add("current");
       lastCaretCharIndex = caret;
-      if (typed.length !== lastCaretInputIndex && (typed.endsWith(" ") || typed.length % 12 === 0)) {
-        el.words.scrollTop = Math.max(0, charSpans[caret].offsetTop - 72);
+      if (typed.length !== lastCaretInputIndex) {
+        const newLineTop = charSpans[caret].offsetTop;
+        if (newLineTop !== currentLineOffsetTop) {
+          currentLineOffsetTop = newLineTop;
+          const lh = calcLineHeight();
+          const lineIndex = lh > 0 ? Math.round(newLineTop / lh) : 0;
+          const newTranslate = lineIndex >= 2 ? -(lineIndex - 1) * lh : 0;
+          if (newTranslate !== wordsTranslateY) {
+            wordsTranslateY = newTranslate;
+            el.words.style.transform = "translateY(" + wordsTranslateY + "px)";
+          }
+        }
       }
       syncSmoothCaret(caret);
     }
@@ -1205,10 +1233,16 @@ export function initMonkeyType() {
     el.page.classList.remove("show-results");
     hideHover();
 
+    wordsTranslateY = 0;
+    currentLineOffsetTop = -1;
+    cachedLineHeight = 0;
+    el.words.style.transition = "none";
+    el.words.style.transform = "translateY(0)";
+    requestAnimationFrame(() => { el.words.style.transition = ""; });
+
     renderText(buildByMode());
     renderControls();
     ensureBuffer();
-    el.words.scrollTop = 0;
     progressHint();
     syncLiveTimePosition();
     syncSmoothCaret(0);

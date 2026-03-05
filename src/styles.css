@@ -459,6 +459,8 @@
       white-space: normal;
       word-break: break-word;
       contain: content;
+      transition: transform 200ms var(--ease-out-soft);
+      will-change: transform;
     }
 
     .char {
@@ -1519,7 +1521,8 @@
       .chart-error,
       .char.extra,
       .live-time,
-      .smooth-caret {
+      .smooth-caret,
+      .words {
         animation: none !important;
         transition: none !important;
       }
