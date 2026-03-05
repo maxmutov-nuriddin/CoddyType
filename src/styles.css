@@ -1022,11 +1022,9 @@
       display: block;
     }
 
-    /* mode bar locked for students */
+    /* mode bar hidden for students — only admin can change settings */
     .page.ctrl-locked .mode-bar {
-      pointer-events: none;
-      opacity: 0.35;
-      user-select: none;
+      display: none;
     }
 
     /* ── Header ── */
