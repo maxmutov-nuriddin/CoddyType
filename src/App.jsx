@@ -249,31 +249,74 @@ const APP_MARKUP = `<div class="page">
 
   <div id="authGate" class="auth-gate hidden">
     <div class="auth-card">
-      <h2 class="auth-title">Вход в систему</h2>
+
+      <div class="auth-brand">
+        <div class="auth-logo">
+          <svg viewBox="0 0 28 22" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.8">
+            <path d="M5 2 L13 11 L5 20"></path>
+            <path d="M13 2 L21 11 L13 20"></path>
+          </svg>
+        </div>
+        <div class="auth-brand-name"><span class="auth-brand-accent">Coddy</span>Type</div>
+      </div>
+
       <div id="authLoading" class="auth-loading">
         <div class="auth-spinner"></div>
-        <span id="authLoadingText">Загрузка...</span>
-      </div>
-      <div class="auth-switch">
-        <button id="showRegisterBtn" class="active" type="button">register</button>
-        <button id="showLoginBtn" type="button">login</button>
+        <span id="authLoadingText">Loading...</span>
       </div>
 
-      <form id="registerForm" class="auth-form">
-        <input id="regGroup" type="text" placeholder="группа" required>
-        <input id="regFirstName" type="text" placeholder="имя" required>
-        <input id="regLastName" type="text" placeholder="фамилия" required>
-        <input id="regPassword" type="password" placeholder="пароль" required>
-        <input id="regPasswordConfirm" type="password" placeholder="повторите пароль" required>
-        <button class="auth-submit" type="submit">создать аккаунт</button>
+      <div class="auth-tabs">
+        <button id="showLoginBtn" class="auth-tab active" type="button">Sign in</button>
+        <button id="showRegisterBtn" class="auth-tab" type="button">Sign up</button>
+        <div class="auth-tab-indicator"></div>
+      </div>
+
+      <form id="loginForm" class="auth-form">
+        <div class="auth-field">
+          <label class="auth-label">First name</label>
+          <input id="loginFirstName" type="text" class="auth-input" placeholder="John" required autocomplete="given-name">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Last name</label>
+          <input id="loginLastName" type="text" class="auth-input" placeholder="Doe" required autocomplete="family-name">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Group</label>
+          <input id="loginGroup" type="text" class="auth-input" placeholder="A1" required autocomplete="off">
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Password</label>
+          <input id="loginPassword" type="password" class="auth-input" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button class="auth-submit" type="submit">Sign in</button>
       </form>
 
-      <form id="loginForm" class="auth-form hidden">
-        <input id="loginFirstName" type="text" placeholder="имя" required>
-        <input id="loginLastName" type="text" placeholder="фамилия" required>
-        <input id="loginGroup" type="text" placeholder="группа" required>
-        <input id="loginPassword" type="password" placeholder="пароль" required>
-        <button class="auth-submit" type="submit">войти</button>
+      <form id="registerForm" class="auth-form hidden">
+        <div class="auth-row">
+          <div class="auth-field">
+            <label class="auth-label">First name</label>
+            <input id="regFirstName" type="text" class="auth-input" placeholder="John" required autocomplete="given-name">
+          </div>
+          <div class="auth-field">
+            <label class="auth-label">Last name</label>
+            <input id="regLastName" type="text" class="auth-input" placeholder="Doe" required autocomplete="family-name">
+          </div>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label">Group</label>
+          <input id="regGroup" type="text" class="auth-input" placeholder="A1" required autocomplete="off">
+        </div>
+        <div class="auth-row">
+          <div class="auth-field">
+            <label class="auth-label">Password</label>
+            <input id="regPassword" type="password" class="auth-input" placeholder="••••••••" required autocomplete="new-password">
+          </div>
+          <div class="auth-field">
+            <label class="auth-label">Confirm password</label>
+            <input id="regPasswordConfirm" type="password" class="auth-input" placeholder="••••••••" required autocomplete="new-password">
+          </div>
+        </div>
+        <button class="auth-submit" type="submit">Create account</button>
       </form>
 
       <div id="authMessage" class="auth-message"></div>

@@ -235,7 +235,7 @@ export function initMonkeyType() {
 
   function setAuthFormLoading(on, text) {
     el.authGate?.classList.toggle("submitting", on);
-    if (el.authLoadingText) el.authLoadingText.textContent = text || "Обработка...";
+    if (el.authLoadingText) el.authLoadingText.textContent = text || "Processing...";
   }
 
   function setAuthMessage(text, isError) {
@@ -250,6 +250,8 @@ export function initMonkeyType() {
     el.showLoginBtn?.classList.toggle("active", !registerActive);
     el.registerForm?.classList.toggle("hidden", !registerActive);
     el.loginForm?.classList.toggle("hidden", registerActive);
+    const indicator = el.authGate?.querySelector(".auth-tab-indicator");
+    if (indicator) indicator.style.transform = registerActive ? "translateX(100%)" : "translateX(0)";
     setAuthMessage("", false);
   }
 
@@ -361,9 +363,9 @@ export function initMonkeyType() {
     const topWpm = wpms.length ? Math.max(...wpms) : 0;
     const avgAcc = accs.length ? accs.reduce((a, b) => a + b, 0) / accs.length : 0;
     if (el.apStatTotal) el.apStatTotal.textContent = total || "—";
-    if (el.apStatAvgWpm) el.apStatAvgWpm.textContent = wpms.length ? fmt2(avgWpm) : "—";
-    if (el.apStatTopWpm) el.apStatTopWpm.textContent = wpms.length ? fmt2(topWpm) : "—";
-    if (el.apStatAvgAcc) el.apStatAvgAcc.textContent = accs.length ? fmt2(avgAcc) + "%" : "—";
+    if (el.apStatAvgWpm) el.apStatAvgWpm.textContent = wpms.length ? Math.round(avgWpm) : "—";
+    if (el.apStatTopWpm) el.apStatTopWpm.textContent = wpms.length ? Math.round(topWpm) : "—";
+    if (el.apStatAvgAcc) el.apStatAvgAcc.textContent = accs.length ? Math.round(avgAcc) + "%" : "—";
   }
 
   function populateGroupFilter(rows) {
@@ -427,9 +429,9 @@ export function initMonkeyType() {
         `<td class="ap-rank">${i + 1}</td>` +
         "<td>" + ((u.firstName || "") + " " + (u.lastName || "")).trim() + "</td>" +
         "<td>" + (u.group || "—") + "</td>" +
-        `<td class="ap-wpm-val">${fmt2(Number(u.maxWpm || 0))}</td>` +
-        "<td>" + fmt2(Number(u.maxAcc || 0)) + "%</td>" +
-        "<td>" + fmt2(Number(u.maxRaw || 0)) + "</td>" +
+        `<td class="ap-wpm-val">${Math.round(Number(u.maxWpm || 0))}</td>` +
+        "<td>" + Math.round(Number(u.maxAcc || 0)) + "%</td>" +
+        "<td>" + Math.round(Number(u.maxRaw || 0)) + "</td>" +
         "<td>" + Number(u.restartCount || 0) + "</td>" +
         "<td>" + (lastAt ? lastAt.toLocaleString() : "—") + "</td>" +
         `<td class="ap-actions">
@@ -509,9 +511,12 @@ export function initMonkeyType() {
     if (!db || !currentUser || !snapshot) return;
     try {
       const userRef = doc(db, "users", currentUser.uid);
-      const maxWpm = Math.max(Number(currentProfile?.maxWpm || 0), Number(snapshot.wpm || 0));
-      const maxAcc = Math.max(Number(currentProfile?.maxAcc || 0), Number(snapshot.acc || 0));
-      const maxRaw = Math.max(Number(currentProfile?.maxRaw || 0), Number(snapshot.raw || 0));
+      // Fetch fresh profile so admin resets are respected
+      const freshSnap = await getDoc(userRef);
+      const fresh = freshSnap.exists() ? freshSnap.data() : {};
+      const maxWpm = Math.round(Math.max(Number(fresh.maxWpm || 0), Number(snapshot.wpm || 0)));
+      const maxAcc = Math.round(Math.max(Number(fresh.maxAcc || 0), Number(snapshot.acc || 0)));
+      const maxRaw = Math.round(Math.max(Number(fresh.maxRaw || 0), Number(snapshot.raw || 0)));
       await addDoc(collection(db, "results"), {
         uid: currentUser.uid,
         login: currentProfile?.login || "",
@@ -633,6 +638,7 @@ export function initMonkeyType() {
       onAuthStateChanged(auth, async (user) => {
         currentUser = user;
         el.authGate?.classList.remove("loading");
+        el.authGate?.classList.remove("submitting");
         if (!user) {
           el.pageLoading?.classList.add("hidden");
           localStorage.removeItem(SESSION_KEY);
@@ -1091,14 +1097,14 @@ export function initMonkeyType() {
     const extra = getExtra();
     const missed = isFinite() ? Math.max(0, targetText.length - Math.min(typed, targetText.length)) : 0;
     const elapsed = settings.mode === "time" ? settings.time : nowElapsed();
-    const wpm = Number(fmt2(getWpm()));
-    const acc = Number(fmt2(getAcc()));
-    const raw = Number(fmt2(getRaw()));
+    const wpm = Math.round(getWpm());
+    const acc = Math.round(getAcc());
+    const raw = Math.round(getRaw());
     const charsText = correct + "/" + incorrect + "/" + extra + "/" + missed;
 
-    el.wpm.textContent = Math.round(wpm);
-    el.acc.textContent = Math.round(acc) + "%";
-    el.raw.textContent = Math.round(raw);
+    el.wpm.textContent = wpm;
+    el.acc.textContent = acc + "%";
+    el.raw.textContent = raw;
     el.chars.textContent = charsText;
     el.consistency.textContent = Math.round(getConsistency()) + "%";
     el.time.textContent = Math.round(elapsed) + "s";
@@ -1114,7 +1120,7 @@ export function initMonkeyType() {
       chars: charsText,
       mode: settings.mode,
       duration: settings.mode === "time" ? settings.time : null,
-      elapsed: Number(fmt2(elapsed))
+      elapsed: Math.round(elapsed)
     };
   }
 
@@ -1395,16 +1401,19 @@ export function initMonkeyType() {
     const password = el.regPassword?.value || "";
     const confirm = el.regPasswordConfirm?.value || "";
     if (!group || !firstName || !lastName || !password || !confirm) {
-      setAuthMessage("Заполните все поля регистрации.", true);
+      setAuthMessage("Please fill in all fields.", true);
+      return;
+    }
+    if (password.length < 6) {
+      setAuthMessage("Password must be at least 6 characters.", true);
       return;
     }
     if (password !== confirm) {
-      setAuthMessage("Пароли не совпадают.", true);
+      setAuthMessage("Passwords do not match.", true);
       return;
     }
     const login = buildLogin(firstName, lastName, group);
-    console.log("[Register] email:", loginToEmail(login));
-    setAuthFormLoading(true, "Создаём аккаунт...");
+    setAuthFormLoading(true, "Creating account...");
     try {
       const cred = await createUserWithEmailAndPassword(auth, loginToEmail(login), password);
       const role = login === "admin" ? "admin" : "student";
@@ -1425,7 +1434,7 @@ export function initMonkeyType() {
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp()
       }, { merge: true });
-      setAuthMessage("Регистрация завершена. Входим...", false);
+      setAuthMessage("Account created. Signing in...", false);
     } catch (err) {
       setAuthFormLoading(false);
       setAuthMessage(mapFirebaseError(err), true);
@@ -1440,20 +1449,18 @@ export function initMonkeyType() {
     const group = (el.loginGroup?.value || "").trim();
     const password = el.loginPassword?.value || "";
     if (!firstName || !lastName || !group || !password) {
-      setAuthMessage("Введите все данные для входа.", true);
+      setAuthMessage("Please fill in all fields.", true);
       return;
     }
     const login = buildLogin(firstName, lastName, group);
     const email = loginToEmail(login);
-    console.log("[Login] email:", email);
-    setAuthFormLoading(true, "Входим...");
+    setAuthFormLoading(true, "Signing in...");
     try {
       await signInWithEmailAndPassword(auth, email, password);
       setAuthMessage("", false);
     } catch (err) {
-      console.error("[Login] error:", err?.code, err?.message);
       setAuthFormLoading(false);
-      setAuthMessage(mapFirebaseError(err) + " (логин: " + login + ")", true);
+      setAuthMessage(mapFirebaseError(err), true);
     }
   }
 
@@ -1806,7 +1813,7 @@ export function initMonkeyType() {
   });
 
   requestAnimationFrame(() => el.page.classList.add("page-ready"));
-  setAuthMode("register");
+  setAuthMode("login");
   renderSessionUi();
   if (localStorage.getItem(SESSION_KEY)) {
     el.pageLoading?.classList.remove("hidden");
