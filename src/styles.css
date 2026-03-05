@@ -873,13 +873,46 @@
       background: var(--bg-color);
     }
 
+    .page-loading-inner {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .page-loading-logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      background: linear-gradient(145deg, #FF9070 0%, #FF4820 100%);
+      display: grid;
+      place-items: center;
+      box-shadow: 0 8px 24px rgba(255, 80, 40, 0.35);
+    }
+
+    .page-loading-logo svg {
+      width: 30px;
+      height: 24px;
+    }
+
+    .page-loading-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.4px;
+      color: var(--text-color);
+    }
+
+    .page-loading-accent {
+      color: var(--main-color);
+    }
+
     .page-loading-spinner {
-      width: 36px;
-      height: 36px;
-      border: 3px solid #3a404b;
+      width: 28px;
+      height: 28px;
+      border: 2.5px solid #2e3340;
       border-top-color: var(--main-color);
       border-radius: 50%;
-      animation: ap-spin 0.8s linear infinite;
+      animation: ap-spin 0.75s linear infinite;
     }
 
     .auth-gate {

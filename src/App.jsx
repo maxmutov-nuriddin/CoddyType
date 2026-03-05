@@ -244,7 +244,16 @@ const APP_MARKUP = `<div class="page">
   </div>
 
   <div id="pageLoading" class="page-loading hidden">
-    <div class="page-loading-spinner"></div>
+    <div class="page-loading-inner">
+      <div class="page-loading-logo">
+        <svg viewBox="0 0 28 22" fill="none" stroke="white" stroke-linecap="round" stroke-linejoin="round" stroke-width="3.8">
+          <path d="M5 2 L13 11 L5 20"></path>
+          <path d="M13 2 L21 11 L13 20"></path>
+        </svg>
+      </div>
+      <div class="page-loading-name"><span class="page-loading-accent">Coddy</span>Type</div>
+      <div class="page-loading-spinner"></div>
+    </div>
   </div>
 
   <div id="authGate" class="auth-gate hidden">
